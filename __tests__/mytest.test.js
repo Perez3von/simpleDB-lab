@@ -1,7 +1,7 @@
 import exp from 'constants';
 import { rm, mkdir } from 'fs/promises';
 // import { get } from 'http';
-import { SimpleDb } from '../simple-db.js';
+import { SimpleDb } from '../utils.js';
 
 describe('simple data structure', () => {
   const rootDir = './test/dataDir';
