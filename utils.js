@@ -1,52 +1,82 @@
-import { readFile, writeFile } from 'fs/promises';
-import shortid from 'shortid';
+import {  writeFile, readFile, readdir, rm } from 'fs/promises';
 import path from 'path';
+import shortid from 'shortid';
 
-
-export class SimpleDatabase {
+export class SimpleDb {
 
   constructor(rootDir){
+    // this.NamId = shortid.generate();
+    // const fileName = `${this.NamId}.json`;
+    // this.theFile = path.join(rootDir, fileName);
     this.path = rootDir;
-    //const fileName = `${shortid.generate()}.txt`;
-    //this.file = path.join(rootDir, fileName);
-
   }
 
-  save(obj) {
-    obj.id = shortid.generate();
-    const filename = `${obj.id}.json`;
-    const des = path.join(this.path, filename);
-    return writeFile(des, JSON.stringify(obj.id)).then(() => {
-      return filename; 
+  // ------------------------------------------------//
+
+  save(obj){
+    const randomID = shortid.generate();
+    const fileName = `${randomID}.json`;
+
+    obj['id'] = randomID;
+    const stringData = JSON.stringify(obj);
+
+    const toFile = path.join(this.path, fileName);
+    return writeFile(toFile, stringData).then(() => {
+      return randomID;
     });
+
   }
 
+  // ------------------------------------------------//
   get(id){
-
-
-    // return readFile(this.file, 'utf-8'/* function to handle json parsing*/).catch((err) => {
-    //   if(err.code === 'ENOENT') return null;
-    //   throw err;
-    // });
-    const filename= path.join(this.path, id);
-    return readFile(filename)
-      .then((res) => {
-        return JSON.parse(res);
-      })
-      .catch(() => {
-        return null;
-      });
-
+    const fileName = `${id}.json`;
+    const toFile = path.join(this.path, fileName);
+    return readFile(toFile, 'utf-8').then((result) => {
+      return JSON.parse(result);
+    }).catch(() => {
+      return null;
+    });
+  
   }
-
-  getAll() {
-    return readFile(this.path).then((f) => {
+  // ------------------------------------------------//
+  getAll(){
+    
+    return readdir(this.path).then((result) => {
       return Promise.all(
-        f.map((file) => {
-          return this.get(file);
+
+        result.map((file) => {
+          const target = file.split('.');
+          return this.get(target[0]);
         })
+
       );
     });
   }
 
-}
+  // ------------------------------------------------//
+  remove(id){
+    const toFile = path.join(this.path, `${id}.json`);
+    return rm(toFile, { force:true, recursive:true }).then(() => {
+      return id;
+    });
+  }
+  // ------------------------------------------------//
+
+
+  update(id, teddy){
+    const toFile = path.join(this.path, `${id}.json`);
+
+    return Promise.all(
+      this.get(id).then((obj) => {
+        obj.a = teddy;
+        return writeFile(toFile, JSON.stringify(obj)).then(() => {
+          // console.log(obj);
+          return obj;
+        });
+      })
+    );
+   
+  }
+
+  // ------------------------------------------------//
+} 
