@@ -1,10 +1,10 @@
-import exp from 'constants';
+
 import { rm, mkdir } from 'fs/promises';
 // import { get } from 'http';
-import { SimpleDb } from '../utils.js';
+import { SimpleDb } from '../lib/utils.js';
 
 describe('simple data structure', () => {
-  const rootDir = './test/dataDir';
+  const rootDir = './__tests__/dataDir';
 
   beforeEach(() => {
     return rm(rootDir, { force:true, recursive:true })
